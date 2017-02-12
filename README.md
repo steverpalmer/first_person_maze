@@ -1,7 +1,7 @@
-Maze 3D
-=======
+First Person Maze
+=================
 
-5 February 2017
+12 February 2017
 
 Navigate a generated (2D) maze using a First-Person 3D view from
 inside the maze.
@@ -11,6 +11,7 @@ Dependencies
 
 * python3
 * pyglet
+* numpy
 * pyrr
 
 Game Play
