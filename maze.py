@@ -28,7 +28,7 @@ class Room:
     """
     A class that models a room within the maze.
 
-    Rooms have walls, an exit direction (egress) and observers.
+    Rooms have walls, an exit direction (egress), a distance and observers.
     """
 
     @constructor
@@ -86,6 +86,7 @@ class Room:
         assert walls & egress == 0
         self._walls = walls
         self._egress = egress
+        self._distance = 0
         self._observers = weakref.WeakSet()
 
     @do_not_trace
@@ -94,9 +95,11 @@ class Room:
         """Logic Error"""
         if not isinstance(self._walls, int): raise TypeError
         if not isinstance(self._egress, Direction): raise TypeError
+        if not isinstance(self._distance, int): raise TypeError
         if self._walls & ~Direction.All: raise RoomWallError
         if self._egress != Direction.Unknown and not self._egress: raise RoomEgressError
         if self._walls & self._egress: raise RoomError
+        if self._distance < 0: raise ValueError
 
     # don't check
     def __str__(self):
@@ -126,6 +129,12 @@ class Room:
             egress = self._egress
             if egress:
                 fields.append("egress=" + str(egress))
+        except Exception:
+            pass
+        try:
+            distance = self._distance
+            if distance:
+                fields.append("distance=" + str(distance))
         except Exception:
             pass
         try:
@@ -249,6 +258,16 @@ class Room:
                 except AttributeError:
                     pass
 
+    @property
+    def distance(self):
+        """Distance to maze exit"""
+        return self._distance
+
+    @distance.setter
+    def distance(self, distance: int):
+        assert distance >= 0
+        self._distance = distance
+
     def attach(self, observer):
         self._observers.add(observer)
 
@@ -322,9 +341,11 @@ class Maze(collections.abc.MutableMapping):
         self._start[0] = random.randrange(self._rooms.shape[0])
         position = self._start
         egress = Direction.South
+        distance = 1
         while (position in self):
             room = self[position]
             room.egress = egress
+            room.distance = distance
             yield position
             options = {}
             for direction in Direction.range():
@@ -338,17 +359,21 @@ class Maze(collections.abc.MutableMapping):
                 room.remove_wall(direction)
                 position = options[direction]
                 egress = direction.reverse()
+                distance += 1
             else:
                 position += egress.offset()
                 if position in self:
                     egress = self[position].egress
+                    distance = self[position].distance
 
     def random_pose(self):
         """
         Random player start position.
         Does not start player facing the wall.
         """
-        position = np.array([random.randrange(limit) for limit in self._rooms.shape])
+        position = self._start
+        while self[position].distance < np.sum(self._rooms.shape) * 2:
+            position = np.array([random.randrange(limit) for limit in self._rooms.shape])
         direction = random.choice(self.exits(position))
         return (position, direction)
 
