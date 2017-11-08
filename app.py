@@ -20,7 +20,7 @@ from tunnel_view_2 import TunnelView2
 
 @traced_methods
 class Main:
-    def __init__(self, size_x:int=None, size_y:int=None):
+    def __init__(self, size_x: int=None, size_y: int=None):
         if size_x is None:
             size_x = 10
         if size_y is None:

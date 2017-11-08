@@ -29,7 +29,7 @@ class GameView(pyglet.window.Window):
     Note that the only the visible view gets updates as the model changes.
     """
 
-    def __init__(self, game_controller, label:str):
+    def __init__(self, game_controller, label: str):
         old_caption = game_controller.window_args.get('caption', None)
         if old_caption is None:
             game_controller.window_args['caption'] = label
@@ -47,7 +47,7 @@ class GameView(pyglet.window.Window):
         self.player = None
         self.active = False
 
-    def add_player(self, player:Player):
+    def add_player(self, player: Player):
         assert player is not None
         self.player = player
         if self.active:
@@ -85,6 +85,7 @@ class GameView(pyglet.window.Window):
     def on_maze_exit(self):
         self.game_controller.close()
 
+
 GameView.register_event_type('on_left_turn')
 GameView.register_event_type('on_right_turn')
 GameView.register_event_type('on_forwards_step')
@@ -106,13 +107,11 @@ class GameController:
         self._current_view_index = None
         self.player = None
 
-        self.controls = { pyglet.window.key.LEFT : 'on_left_turn'
-                        , pyglet.window.key.RIGHT : 'on_right_turn'
-                        , pyglet.window.key.UP : 'on_forwards_step'
-                        , pyglet.window.key.DOWN : 'on_backwards_step'
-                        , pyglet.window.key.SPACE : 'on_next_view'
-                        }
-
+        self.controls = {pyglet.window.key.LEFT: 'on_left_turn',
+                         pyglet.window.key.RIGHT: 'on_right_turn',
+                         pyglet.window.key.UP: 'on_forwards_step',
+                         pyglet.window.key.DOWN: 'on_backwards_step',
+                         pyglet.window.key.SPACE: 'on_next_view'}
 
     def add_view(self, cls, *args, **kwargs):
         """
@@ -125,7 +124,7 @@ class GameController:
         self.available_views.append(new_view)
         return result
 
-    def add_player(self, player:Player):
+    def add_player(self, player: Player):
         """
         Add a player to the game.
         """
@@ -139,7 +138,7 @@ class GameController:
         return self._current_view_index
 
     @current_view_index.setter
-    def current_view_index(self, index_:int):
+    def current_view_index(self, index_: int):
         if self._current_view_index is not None:
             self.available_views[self._current_view_index].exit()
         self._current_view_index = index_

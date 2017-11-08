@@ -12,9 +12,9 @@ import weakref
 import numpy as np
 
 from utils import traced_methods, do_not_trace, \
-                  checked_methods, constructor, query, procedure, invariant_checker
+    checked_methods, constructor, query, procedure, invariant_checker
 
-from direction import *
+from direction import Direction
 
 
 class RoomWallError(Exception): pass
@@ -32,7 +32,7 @@ class Room:
     """
 
     @constructor
-    def __init__(self, walls:Direction=Direction.All, egress:Direction=Direction.Unknown):
+    def __init__(self, walls: Direction=Direction.All, egress: Direction=Direction.Unknown):
         """
         >>> Room().walls == Direction.All
         True
@@ -120,13 +120,13 @@ class Room:
                 if walls & Direction.East: field += "E"
                 if walls & Direction.West: field += "W"
                 fields.append(field)
-        except:
+        except Exception:
             pass
         try:
             egress = self._egress
             if egress:
                 fields.append("egress=" + str(egress))
-        except:
+        except Exception:
             pass
         try:
             self._check()
@@ -141,7 +141,7 @@ class Room:
         return self._walls
 
     @walls.setter
-    def walls(self, walls:int):
+    def walls(self, walls: int):
         assert isinstance(walls, int)
         assert not (walls & ~Direction.All)
         assert walls & self._egress == 0
@@ -265,7 +265,7 @@ class Maze(collections.abc.MutableMapping):
     For convenience, many of the methods on Rooms are repeated, parameterised by the room position.
     """
 
-    def __init__(self, shape:np.ndarray):
+    def __init__(self, shape: np.ndarray):
         super().__init__()
         self._rooms = np.empty(shape, dtype=np.object_)
         for p in self:
@@ -276,20 +276,20 @@ class Maze(collections.abc.MutableMapping):
     def __len__(self):
         return self._rooms.size
 
-    def __getitem__(self, key:np.ndarray):
+    def __getitem__(self, key: np.ndarray):
         return self._rooms[tuple(key)]
 
-    def __setitem__(self, key:np.ndarray, value:Room):
+    def __setitem__(self, key: np.ndarray, value: Room):
         self._rooms[tuple(key)] = value
 
-    def __delitem__(self, key:np.ndarray):
+    def __delitem__(self, key: np.ndarray):
         raise RuntimeError
 
     def __iter__(self):
         for position in itertools.product(*[range(limit) for limit in self._rooms.shape]):
             yield np.array(position)
 
-    def __contains__(self, key:np.ndarray):
+    def __contains__(self, key: np.ndarray):
         return np.all(0 <= key) and np.all(key < self._rooms.shape)
 
     # Other Features
@@ -299,16 +299,16 @@ class Maze(collections.abc.MutableMapping):
         """shape of maze"""
         return np.array(self._rooms.shape)
 
-    def is_sealed(self, position:np.ndarray):
+    def is_sealed(self, position: np.ndarray):
         return self[position].is_sealed()
 
-    def can_move(self, position:np.ndarray, direction:Direction):
+    def can_move(self, position: np.ndarray, direction: Direction):
         return self[position].can_move(direction)
 
-    def remove_wall(self, position:np.ndarray, direction:Direction):
+    def remove_wall(self, position: np.ndarray, direction: Direction):
         self[position].remove_wall(direction)
 
-    def exits(self, position:np.ndarray):
+    def exits(self, position: np.ndarray):
         return self[position].exits()
 
     # maze processes
@@ -359,11 +359,10 @@ class Maze(collections.abc.MutableMapping):
         The result is first built up in the positions list.
         The Walker follows the left hand wall.
         """
-        wall_offset = { Direction.North : np.array([thickness, 1.0 - thickness])
-                      , Direction.East  : np.array([1.0 - thickness, 1.0 - thickness])
-                      , Direction.South : np.array([1.0 - thickness, thickness])
-                      , Direction.West  : np.array([thickness, thickness])
-                      }
+        wall_offset = {Direction.North: np.array([thickness, 1.0 - thickness]),
+                       Direction.East: np.array([1.0 - thickness, 1.0 - thickness]),
+                       Direction.South: np.array([1.0 - thickness, thickness]),
+                       Direction.West: np.array([thickness, thickness])}
         walker_position = self._start.copy()
         walker_direction = Direction.North
         positions = [walker_position + np.array([thickness, 0.0])]

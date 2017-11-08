@@ -14,13 +14,12 @@ from game_controller import GameView
 @traced_methods
 class TunnelView(GameView):
 
-
-    def __init__(self, game_controller, label:str=None):
+    def __init__(self, game_controller, label: str=None):
         super().__init__(game_controller, label or "Tunnel View")
         self._step_max = game_controller.maze.shape.max()
         self.indices = []
 
-    def on_resize(self, width:int, height:int):
+    def on_resize(self, width: int, height: int):
         self.switch_to()
         super().on_resize(width, height)
         vertices = []
@@ -125,5 +124,6 @@ class TunnelView(GameView):
                                          self.indices,
                                          self.vertices,
                                          self.vertices_colour)
+
 
 __all__ = ('TunnelView')

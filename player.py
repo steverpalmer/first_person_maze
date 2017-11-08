@@ -24,7 +24,7 @@ class Player(pyglet.event.EventDispatcher):
     The player in turn may generate other events, specifically
     on_direction_update, on_position_update and on_maze_exit.
     """
-    def __init__(self, maze:Maze):
+    def __init__(self, maze: Maze):
         super().__init__()
         self.maze = maze
         self._position, self._direction = maze.random_pose()

@@ -141,7 +141,7 @@ class Direction(enum.IntEnum):
         return result
 
     @staticmethod
-    def range(mask:int=None):
+    def range(mask: int=None):
         """
         >>> len(Direction.range())
         4
@@ -196,12 +196,14 @@ class Direction(enum.IntEnum):
         """
         return _DATA[self].offset
 
+
 _DataItem = collections.namedtuple('DataItem', ['bearing', 'offset'])
-_DATA = collections.OrderedDict([ (Direction.North, _DataItem(0, np.array([0, 1])))
-                                , (Direction.East, _DataItem(1, np.array([1, 0])))
-                                , (Direction.South, _DataItem(2, np.array([0, -1])))
-                                , (Direction.West, _DataItem(3, np.array([-1, 0])))
-                                ])
+
+
+_DATA = collections.OrderedDict([(Direction.North, _DataItem(0, np.array([0, 1]))),
+                                 (Direction.East, _DataItem(1, np.array([1, 0]))),
+                                 (Direction.South, _DataItem(2, np.array([0, -1]))),
+                                 (Direction.West, _DataItem(3, np.array([-1, 0])))])
 
 
 __all__ = ['Direction']

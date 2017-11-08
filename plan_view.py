@@ -14,7 +14,7 @@ from game_controller import GameView
 @traced_methods
 class RoomSprite(pyglet.sprite.Sprite):
 
-    def __init__(self, planview, position:np.ndarray, room, *args, **kwargs):
+    def __init__(self, planview, position: np.ndarray, room, *args, **kwargs):
         self.planview = planview
         self.room_position = position
         super().__init__(planview.room_image(room.walls), *args, **kwargs)
@@ -59,7 +59,7 @@ class PlayerSprite(pyglet.sprite.Sprite):
 @traced_methods
 class PlanView(GameView):
 
-    def __init__(self, game_controller, label:str=None):
+    def __init__(self, game_controller, label: str=None):
         super().__init__(game_controller, label or "Plan View")
 
         # Maze Image Stuff
@@ -85,10 +85,10 @@ class PlanView(GameView):
             self.rooms.append(RoomSprite(self, position, room, batch=self.batch, group=background))
         self.player_sprite = None
 
-    def room_image(self, i:int):
+    def room_image(self, i: int):
         return self._room_atlas[i]
 
-    def player_image(self, i:int):
+    def player_image(self, i: int):
         return self._player_atlas[i]
 
     def update_scaling(self):
@@ -98,7 +98,7 @@ class PlanView(GameView):
         self.scale = self.sprite_scale * self._tile_size
         self.offset = (window_shape - maze_shape * self.scale) // 2
 
-    def position2xy(self, position:np.ndarray):
+    def position2xy(self, position: np.ndarray):
         return tuple((position * self.scale) + self.offset)
 
     def add_player(self, player):
@@ -131,7 +131,7 @@ class PlanView(GameView):
             self.clear()
             self.batch.draw()
 
-    def on_resize(self, width:int, height:int):
+    def on_resize(self, width: int, height: int):
         if self.active:
             self.switch_to()
             super().on_resize(width, height)

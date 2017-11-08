@@ -12,11 +12,12 @@ import logging
 # Instruments the code with logging functionality to trace execution
 # ======================================================================================================================
 
-def modlog(log:str):
+def modlog(log: str):
     if log == '__main__':
         log = ''
     result = logging.getLogger(log)
     return result
+
 
 def traced(func=None, *, level=None, log=None, with_params=None, on_entry=None, on_exit=None, with_result=None):
     if func is None:
@@ -151,7 +152,7 @@ def checked_methods(cls=None, *, checker=None):
                     if method._check_type == 'invariant_checker':
                         assert checker is None
                         checker = method
-                except:
+                except Exception:
                     pass
         assert callable(checker)
         for name, val in vars(cls).items():
@@ -159,9 +160,11 @@ def checked_methods(cls=None, *, checker=None):
                 setattr(cls, name, method_checked(val, checker=checker))
     return cls
 
+
 # ======================================================================================================================
 # Singleton Metaclass
 # ======================================================================================================================
+
 
 class Singleton(type):
     def __init__(self, *args, **kwargs):
