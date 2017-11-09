@@ -42,6 +42,7 @@ class TunnelView2(GameView):
                               gl.GL_QUADS,
                               'gravel.jpg')
         self.walls = None
+        self.egress = None
 
         self.program = GLProgram((GLShader.from_file(*args)
                                   for args in ((gl.GL_VERTEX_SHADER, 'tunnel_view.vert.glsl'),
@@ -101,6 +102,24 @@ class TunnelView2(GameView):
         wall_indices[3::4] = wall_indices[::4] + 2
         self.walls = GLShape(wall_vertices, wall_indices, gl.GL_QUADS, 'hedge.jpg')
 
+        exit_vertices = np.recarray((4,), dtype=[('position', np.float32, 3), ('texture', np.float32, 2)])
+        exit_vertices['position'][:2] = wall_vertices['position'][:2]
+        exit_vertices['position'][2:] = wall_vertices['position'][-2:]
+        exit_vertices['texture'][0, 0] = 1.0
+        exit_vertices['texture'][0, 1] = 0.0
+        exit_vertices['texture'][1, 0] = 1.0
+        exit_vertices['texture'][1, 1] = 1.0
+        exit_vertices['texture'][2, 0] = 0.0
+        exit_vertices['texture'][2, 1] = 0.0
+        exit_vertices['texture'][3, 0] = 0.0
+        exit_vertices['texture'][3, 1] = 1.0
+        exit_indices = np.empty((4,), dtype=np.uint32)
+        exit_indices[0] = 0
+        exit_indices[1] = 1
+        exit_indices[2] = 3
+        exit_indices[3] = 2
+        self.egress = GLShape(exit_vertices, exit_indices, gl.GL_QUADS, 'exit2.jpg')
+        
     _target_offset = {Direction.North: -pyrr.vector3.create_unit_length_z(dtype=np.float32),
                       Direction.East: pyrr.vector3.create_unit_length_x(dtype=np.float32),
                       Direction.South: pyrr.vector3.create_unit_length_z(dtype=np.float32),
@@ -178,6 +197,8 @@ class TunnelView2(GameView):
             self.ground.draw()
             if self.walls is not None:
                 self.walls.draw()
+            if self.egress is not None:
+                self.egress.draw()
 
     @do_not_trace
     def scheduled_update(self, dt):
