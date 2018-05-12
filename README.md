@@ -13,6 +13,7 @@ Dependencies
 * pyglet
 * numpy
 * pyrr
+(see `requirements.txt`)
 
 Game Play
 ---------
