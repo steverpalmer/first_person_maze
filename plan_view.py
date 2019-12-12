@@ -24,7 +24,7 @@ class RoomSprite(pyglet.sprite.Sprite):
     def view_update(self):
         self.planview.switch_to()
         self.scale = self.planview.sprite_scale
-        self.set_position(*self.planview.position2xy(self.room_position))
+        self.position = self.planview.position2xy(self.room_position)
 
     def walls_update(self, _, walls):
         self.planview.switch_to()
@@ -53,7 +53,7 @@ class PlayerSprite(pyglet.sprite.Sprite):
 
     def position_update(self):
         self.planview.switch_to()
-        self.set_position(*self.planview.position2xy(self.player.position))
+        self.position = self.planview.position2xy(self.player.position)
 
 
 @traced_methods
