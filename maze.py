@@ -11,15 +11,29 @@ import weakref
 
 import numpy as np
 
-from utils import traced_methods, do_not_trace, \
-    checked_methods, constructor, query, procedure, invariant_checker
+from utils import (
+    traced_methods,
+    do_not_trace,
+    checked_methods,
+    constructor,
+    query,
+    procedure,
+    invariant_checker,
+)
 
 from direction import Direction
 
 
-class RoomWallError(Exception): pass
-class RoomEgressError(Exception): pass
-class RoomError(Exception): pass
+class RoomWallError(Exception):
+    pass
+
+
+class RoomEgressError(Exception):
+    pass
+
+
+class RoomError(Exception):
+    pass
 
 
 @checked_methods
@@ -32,7 +46,9 @@ class Room:
     """
 
     @constructor
-    def __init__(self, walls: Direction=Direction.All, egress: Direction=Direction.Unknown):
+    def __init__(
+        self, walls: Direction = Direction.All, egress: Direction = Direction.Unknown
+    ):
         """
         >>> Room().walls == Direction.All
         True
@@ -93,13 +109,20 @@ class Room:
     @invariant_checker
     def _check(self):
         """Logic Error"""
-        if not isinstance(self._walls, int): raise TypeError
-        if not isinstance(self._egress, Direction): raise TypeError
-        if not isinstance(self._distance, int): raise TypeError
-        if self._walls & ~Direction.All: raise RoomWallError
-        if self._egress != Direction.Unknown and not self._egress: raise RoomEgressError
-        if self._walls & self._egress: raise RoomError
-        if self._distance < 0: raise ValueError
+        if not isinstance(self._walls, int):
+            raise TypeError
+        if not isinstance(self._egress, Direction):
+            raise TypeError
+        if not isinstance(self._distance, int):
+            raise TypeError
+        if self._walls & ~Direction.All:
+            raise RoomWallError
+        if self._egress != Direction.Unknown and not self._egress:
+            raise RoomEgressError
+        if self._walls & self._egress:
+            raise RoomError
+        if self._distance < 0:
+            raise ValueError
 
     # don't check
     def __str__(self):
@@ -118,10 +141,14 @@ class Room:
             walls = self._walls
             if walls != 0:
                 field = "walls="
-                if walls & Direction.North: field += "N"
-                if walls & Direction.South: field += "S"
-                if walls & Direction.East: field += "E"
-                if walls & Direction.West: field += "W"
+                if walls & Direction.North:
+                    field += "N"
+                if walls & Direction.South:
+                    field += "S"
+                if walls & Direction.East:
+                    field += "E"
+                if walls & Direction.West:
+                    field += "W"
                 fields.append(field)
         except Exception:
             pass
@@ -305,7 +332,9 @@ class Maze(collections.abc.MutableMapping):
         raise RuntimeError
 
     def __iter__(self):
-        for position in itertools.product(*[range(limit) for limit in self._rooms.shape]):
+        for position in itertools.product(
+            *[range(limit) for limit in self._rooms.shape]
+        ):
             yield np.array(position)
 
     def __contains__(self, key: np.ndarray):
@@ -342,7 +371,7 @@ class Maze(collections.abc.MutableMapping):
         position = self._start
         egress = Direction.South
         distance = 1
-        while (position in self):
+        while position in self:
             room = self[position]
             room.egress = egress
             room.distance = distance
@@ -373,7 +402,9 @@ class Maze(collections.abc.MutableMapping):
         """
         position = self._start
         while self[position].distance < np.sum(self._rooms.shape) * 2:
-            position = np.array([random.randrange(limit) for limit in self._rooms.shape])
+            position = np.array(
+                [random.randrange(limit) for limit in self._rooms.shape]
+            )
         direction = random.choice(self.exits(position))
         return (position, direction)
 
@@ -384,10 +415,12 @@ class Maze(collections.abc.MutableMapping):
         The result is first built up in the positions list.
         The Walker follows the left hand wall.
         """
-        wall_offset = {Direction.North: np.array([thickness, 1.0 - thickness]),
-                       Direction.East: np.array([1.0 - thickness, 1.0 - thickness]),
-                       Direction.South: np.array([1.0 - thickness, thickness]),
-                       Direction.West: np.array([thickness, thickness])}
+        wall_offset = {
+            Direction.North: np.array([thickness, 1.0 - thickness]),
+            Direction.East: np.array([1.0 - thickness, 1.0 - thickness]),
+            Direction.South: np.array([1.0 - thickness, thickness]),
+            Direction.West: np.array([thickness, thickness]),
+        }
         walker_position = self._start.copy()
         walker_direction = Direction.North
         positions = [walker_position + np.array([thickness, 0.0])]
@@ -412,8 +445,9 @@ class Maze(collections.abc.MutableMapping):
         return np.array(positions, dtype=np.float32)
 
 
-__all__ = ('Room', 'Maze')
+__all__ = ("Room", "Maze")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

@@ -13,8 +13,7 @@ from game_controller import GameView
 
 @traced_methods
 class TunnelView(GameView):
-
-    def __init__(self, game_controller, label: str=None):
+    def __init__(self, game_controller, label: str = None):
         super().__init__(game_controller, label or "Tunnel View")
         self._step_max = game_controller.maze.shape.max()
         self.indices = []
@@ -46,8 +45,8 @@ class TunnelView(GameView):
             #  5. Right Top Inner
             vertices.extend((centre[0] + offset[0], centre[1] + next_offset[1]))
         self.vertices_count = len(vertices) // 2
-        self.vertices = ('v2i', vertices)
-        self.vertices_colour = ('c4B', (255, 255, 255, 255) * self.vertices_count)
+        self.vertices = ("v2i", vertices)
+        self.vertices_colour = ("c4B", (255, 255, 255, 255) * self.vertices_count)
 
     def entry(self):
         super().entry()
@@ -65,44 +64,70 @@ class TunnelView(GameView):
             if not direction:  # Beyond the far wall
                 pass
             elif position not in self.game_controller.maze:  # Maze Exit
-                indices.extend(((step - 1) << 3 | 0, (step - 1) << 3 | 1))  # previous left post
-                indices.extend(((step - 1) << 3 | 2, (step - 1) << 3 | 3))  # previous right post
+                indices.extend(
+                    ((step - 1) << 3 | 0, (step - 1) << 3 | 1)
+                )  # previous left post
+                indices.extend(
+                    ((step - 1) << 3 | 2, (step - 1) << 3 | 3)
+                )  # previous right post
                 indices.extend((step << 3 | 0, step << 3 | 1))  # this left post
                 indices.extend((step << 3 | 2, step << 3 | 3))  # this right post
                 break
             else:
                 room = self.game_controller.maze[position]
                 if room.can_move(left):
-                    indices.extend(((step - 1) << 3 | 4, step << 3 | 0))  # left bottom gap
+                    indices.extend(
+                        ((step - 1) << 3 | 4, step << 3 | 0)
+                    )  # left bottom gap
                     indices.extend(((step - 1) << 3 | 5, step << 3 | 1))  # left top gap
                     left_post = True
                     if step > 0:
-                        indices.extend(((step - 1) << 3 | 0, (step - 1) << 3 | 1))  # previous left post
+                        indices.extend(
+                            ((step - 1) << 3 | 0, (step - 1) << 3 | 1)
+                        )  # previous left post
                 else:
-                    indices.extend(((step - 1) << 3 | 0, step << 3 | 0))  # left bottom wall
-                    indices.extend(((step - 1) << 3 | 1, step << 3 | 1))  # left top wall
+                    indices.extend(
+                        ((step - 1) << 3 | 0, step << 3 | 0)
+                    )  # left bottom wall
+                    indices.extend(
+                        ((step - 1) << 3 | 1, step << 3 | 1)
+                    )  # left top wall
                     left_post = False
                 if room.can_move(right):
-                    indices.extend(((step - 1) << 3 | 6, step << 3 | 2))  # right bottom gap
-                    indices.extend(((step - 1) << 3 | 7, step << 3 | 3))  # right top gap
+                    indices.extend(
+                        ((step - 1) << 3 | 6, step << 3 | 2)
+                    )  # right bottom gap
+                    indices.extend(
+                        ((step - 1) << 3 | 7, step << 3 | 3)
+                    )  # right top gap
                     right_post = True
                     if step > 0:
-                        indices.extend(((step - 1) << 3 | 2, (step - 1) << 3 | 3))  # previous right post
+                        indices.extend(
+                            ((step - 1) << 3 | 2, (step - 1) << 3 | 3)
+                        )  # previous right post
                 else:
-                    indices.extend(((step - 1) << 3 | 2, step << 3 | 2))  # right bottom wall
-                    indices.extend(((step - 1) << 3 | 3, step << 3 | 3))  # right top wall
+                    indices.extend(
+                        ((step - 1) << 3 | 2, step << 3 | 2)
+                    )  # right bottom wall
+                    indices.extend(
+                        ((step - 1) << 3 | 3, step << 3 | 3)
+                    )  # right top wall
                     right_post = False
                 if room.can_move(direction):
                     if left_post:
                         indices.extend((step << 3 | 0, step << 3 | 1))  # this left post
                     if right_post:
-                        indices.extend((step << 3 | 2, step << 3 | 3))  # this right post
+                        indices.extend(
+                            (step << 3 | 2, step << 3 | 3)
+                        )  # this right post
                     position += direction.offset()
                 else:
                     if not left_post:
                         indices.extend((step << 3 | 0, step << 3 | 1))  # this left post
                     if not right_post:
-                        indices.extend((step << 3 | 2, step << 3 | 3))  # this right post
+                        indices.extend(
+                            (step << 3 | 2, step << 3 | 3)
+                        )  # this right post
                     indices.extend((step << 3 | 0, step << 3 | 2))  # end bottom wall
                     indices.extend((step << 3 | 1, step << 3 | 3))  # end top wall
                     break
@@ -119,11 +144,13 @@ class TunnelView(GameView):
         if self.active and self.player is not None:
             self.switch_to()
             self.clear()
-            pyglet.graphics.draw_indexed(self.vertices_count,
-                                         pyglet.gl.GL_LINES,
-                                         self.indices,
-                                         self.vertices,
-                                         self.vertices_colour)
+            pyglet.graphics.draw_indexed(
+                self.vertices_count,
+                pyglet.gl.GL_LINES,
+                self.indices,
+                self.vertices,
+                self.vertices_colour,
+            )
 
 
-__all__ = ('TunnelView')
+__all__ = "TunnelView"

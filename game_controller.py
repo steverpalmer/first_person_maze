@@ -30,18 +30,18 @@ class GameView(pyglet.window.Window):
     """
 
     def __init__(self, game_controller, label: str):
-        old_caption = game_controller.window_args.get('caption', None)
+        old_caption = game_controller.window_args.get("caption", None)
         if old_caption is None:
-            game_controller.window_args['caption'] = label
+            game_controller.window_args["caption"] = label
         else:
-            game_controller.window_args['caption'] = old_caption + " - " + label
+            game_controller.window_args["caption"] = old_caption + " - " + label
         display = pyglet.canvas.get_display()
         canvas = pyglet.canvas.Canvas(display, None)
         template = pyglet.gl.Config(double_buffer=True, depth_size=24)
         config = template.match(canvas)[0]
         context = config.create_context(None)
         super().__init__(context=context, **game_controller.window_args)
-        game_controller.window_args['caption'] = old_caption
+        game_controller.window_args["caption"] = old_caption
 
         self.game_controller = game_controller
         self.player = None
@@ -86,32 +86,33 @@ class GameView(pyglet.window.Window):
         self.game_controller.close()
 
 
-GameView.register_event_type('on_left_turn')
-GameView.register_event_type('on_right_turn')
-GameView.register_event_type('on_forwards_step')
-GameView.register_event_type('on_backwards_step')
-GameView.register_event_type('on_next_view')
+GameView.register_event_type("on_left_turn")
+GameView.register_event_type("on_right_turn")
+GameView.register_event_type("on_forwards_step")
+GameView.register_event_type("on_backwards_step")
+GameView.register_event_type("on_next_view")
 
 
 @traced_methods
 class GameController:
-
     def __init__(self, **kwargs):
         super().__init__()
-        self.maze = kwargs['maze']
-        del kwargs['maze']
+        self.maze = kwargs["maze"]
+        del kwargs["maze"]
         self.window_args = kwargs
-        self.window_args['visible'] = False
-        self.window_args['resizable'] = True
+        self.window_args["visible"] = False
+        self.window_args["resizable"] = True
         self.available_views = []
         self._current_view_index = None
         self.player = None
 
-        self.controls = {pyglet.window.key.LEFT: 'on_left_turn',
-                         pyglet.window.key.RIGHT: 'on_right_turn',
-                         pyglet.window.key.UP: 'on_forwards_step',
-                         pyglet.window.key.DOWN: 'on_backwards_step',
-                         pyglet.window.key.SPACE: 'on_next_view'}
+        self.controls = {
+            pyglet.window.key.LEFT: "on_left_turn",
+            pyglet.window.key.RIGHT: "on_right_turn",
+            pyglet.window.key.UP: "on_forwards_step",
+            pyglet.window.key.DOWN: "on_backwards_step",
+            pyglet.window.key.SPACE: "on_next_view",
+        }
 
     def add_view(self, cls, *args, **kwargs):
         """
@@ -147,11 +148,13 @@ class GameController:
 
     def next_view(self):
         if self._current_view_index is not None and len(self.available_views) > 1:
-            self.current_view_index = (self._current_view_index + 1) % len(self.available_views)
+            self.current_view_index = (self._current_view_index + 1) % len(
+                self.available_views
+            )
 
     def close(self):
         self.current_view_index = None
         pyglet.app.exit()
 
 
-__all__ = ('GameView', 'GameController')
+__all__ = ("GameView", "GameController")

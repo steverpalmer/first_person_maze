@@ -13,7 +13,6 @@ from game_controller import GameView
 
 @traced_methods
 class RoomSprite(pyglet.sprite.Sprite):
-
     def __init__(self, planview, position: np.ndarray, room, *args, **kwargs):
         self.planview = planview
         self.room_position = position
@@ -33,12 +32,14 @@ class RoomSprite(pyglet.sprite.Sprite):
 
 @traced_methods
 class PlayerSprite(pyglet.sprite.Sprite):
-
     def __init__(self, planview, player, *args, **kwargs):
         self.planview = planview
         self.player = player
-        super().__init__(planview.player_image(player.direction.right_angle_bearing()),
-                         *args, **kwargs)
+        super().__init__(
+            planview.player_image(player.direction.right_angle_bearing()),
+            *args,
+            **kwargs
+        )
         self.view_update()
 
     def view_update(self):
@@ -49,7 +50,9 @@ class PlayerSprite(pyglet.sprite.Sprite):
 
     def direction_update(self):
         self.planview.switch_to()
-        self.image = self.planview.player_image(self.player.direction.right_angle_bearing())
+        self.image = self.planview.player_image(
+            self.player.direction.right_angle_bearing()
+        )
 
     def position_update(self):
         self.planview.switch_to()
@@ -58,18 +61,19 @@ class PlayerSprite(pyglet.sprite.Sprite):
 
 @traced_methods
 class PlanView(GameView):
-
-    def __init__(self, game_controller, label: str=None):
+    def __init__(self, game_controller, label: str = None):
         super().__init__(game_controller, label or "Plan View")
 
         # Maze Image Stuff
-        room_atlas_img = pyglet.image.load('rooms_atlas.png')
+        room_atlas_img = pyglet.image.load("rooms_atlas.png")
         self._tile_size = room_atlas_img.height
-        self._room_atlas = pyglet.image.ImageGrid(room_atlas_img, 1, 16, column_padding=2)
+        self._room_atlas = pyglet.image.ImageGrid(
+            room_atlas_img, 1, 16, column_padding=2
+        )
         assert self._room_atlas[0].width == self._tile_size
 
         # Player Image Stuff
-        player_atlas_img = pyglet.image.load('player_atlas.png')
+        player_atlas_img = pyglet.image.load("player_atlas.png")
         assert self._tile_size == player_atlas_img.height
         assert player_atlas_img.width / self._tile_size == 4
         self._player_atlas = pyglet.image.ImageGrid(player_atlas_img, 1, 4)
@@ -82,7 +86,9 @@ class PlanView(GameView):
         background = pyglet.graphics.OrderedGroup(0)
         self.rooms = []
         for position, room in game_controller.maze.items():
-            self.rooms.append(RoomSprite(self, position, room, batch=self.batch, group=background))
+            self.rooms.append(
+                RoomSprite(self, position, room, batch=self.batch, group=background)
+            )
         self.player_sprite = None
 
     def room_image(self, i: int):
@@ -94,7 +100,9 @@ class PlanView(GameView):
     def update_scaling(self):
         window_shape = np.array([self.width, self.height])
         maze_shape = self.game_controller.maze.shape
-        self.sprite_scale = max(int((window_shape / maze_shape).min() / self._tile_size), 1)
+        self.sprite_scale = max(
+            int((window_shape / maze_shape).min() / self._tile_size), 1
+        )
         self.scale = self.sprite_scale * self._tile_size
         self.offset = (window_shape - maze_shape * self.scale) // 2
 
@@ -106,7 +114,9 @@ class PlanView(GameView):
         self.switch_to()
         assert self.player_sprite is None
         foreground = pyglet.graphics.OrderedGroup(1)
-        self.player_sprite = PlayerSprite(self, player, batch=self.batch, group=foreground)
+        self.player_sprite = PlayerSprite(
+            self, player, batch=self.batch, group=foreground
+        )
 
     def entry(self):
         super().entry()
@@ -142,4 +152,4 @@ class PlanView(GameView):
                 self.player_sprite.view_update()
 
 
-__all__ = ('PlanView')
+__all__ = "PlanView"

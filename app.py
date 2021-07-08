@@ -20,7 +20,7 @@ from tunnel_view_2 import TunnelView2
 
 @traced_methods
 class Main:
-    def __init__(self, size_x: int=None, size_y: int=None):
+    def __init__(self, size_x: int = None, size_y: int = None):
         if size_x is None:
             size_x = 10
         if size_y is None:
@@ -46,9 +46,10 @@ class Main:
         pyglet.app.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pathlib import Path
-    logging_config = Path('logging.conf')
+
+    logging_config = Path("logging.conf")
     if logging_config.exists():
         logging.config.fileConfig(logging_config.open())
     Main().go()

@@ -15,7 +15,8 @@ import pyglet.gl as gl
 from utils import traced_methods, traced
 
 
-class GLObjectException(Exception): pass
+class GLObjectException(Exception):
+    pass
 
 
 @traced_methods
@@ -34,21 +35,27 @@ class GLObject:
 @traced_methods
 class GLShader(GLObject):
 
-    shader_type_name = {gl.GL_VERTEX_SHADER: "Vertex Shader",
-                        gl.GL_GEOMETRY_SHADER: "Geometry Shader",
-                        gl.GL_FRAGMENT_SHADER: "Fragment Shader"}
+    shader_type_name = {
+        gl.GL_VERTEX_SHADER: "Vertex Shader",
+        gl.GL_GEOMETRY_SHADER: "Geometry Shader",
+        gl.GL_FRAGMENT_SHADER: "Fragment Shader",
+    }
 
     def __init__(self, shader_type, source):
-        if shader_type not in GLShader.shader_type_name: raise ValueError
+        if shader_type not in GLShader.shader_type_name:
+            raise ValueError
         self._shader_type = shader_type
         self._source = source
         super().__init__(gl.glCreateShader(shader_type))
         if isinstance(source, str):
             source = source.encode()
-        if not isinstance(source, bytes): raise TypeError
+        if not isinstance(source, bytes):
+            raise TypeError
         c_source = ctypes.create_string_buffer(source)
-        c_source = ctypes.cast(ctypes.pointer(ctypes.pointer(c_source)),
-                               ctypes.POINTER(ctypes.POINTER(gl.GLchar)))
+        c_source = ctypes.cast(
+            ctypes.pointer(ctypes.pointer(c_source)),
+            ctypes.POINTER(ctypes.POINTER(gl.GLchar)),
+        )
         gl.glShaderSource(self.gl_id, 1, c_source, None)
         gl.glCompileShader(self.gl_id)
         rc = gl.GLint(0)
@@ -57,10 +64,16 @@ class GLShader(GLObject):
             gl.glGetShaderiv(self.gl_id, gl.GL_INFO_LOG_LENGTH, ctypes.byref(rc))
             buffer = ctypes.create_string_buffer(rc.value)
             gl.glGetShaderInfoLog(self.gl_id, rc, None, buffer)
-            raise GLObjectException("{}\n{}".format(GLShader.shader_type_name[shader_type], buffer.value.decode()))
+            raise GLObjectException(
+                "{}\n{}".format(
+                    GLShader.shader_type_name[shader_type], buffer.value.decode()
+                )
+            )
 
     def __repr__(self):
-        return "GLShader({}, {})".format(GLShader.shader_type_name[self._shader_type], repr(self._source))
+        return "GLShader({}, {})".format(
+            GLShader.shader_type_name[self._shader_type], repr(self._source)
+        )
 
     def __del__(self):
         gl.glDeleteShader(self.gl_id)
@@ -81,7 +94,6 @@ class GLShader(GLObject):
 
 @traced_methods
 class GLProgram(GLObject):
-
     def __init__(self, shaders=None, *, do_link=None, do_use=None):
         if shaders is None:
             shaders = []
@@ -102,20 +114,24 @@ class GLProgram(GLObject):
     def __repr__(self):
         params = []
         if self._shaders:
-            params.append("[{}]".format(", ".join([repr(shader) for shader in self.shaders])))
+            params.append(
+                "[{}]".format(", ".join([repr(shader) for shader in self.shaders]))
+            )
         if not self._done_link:
             params.append("do_link=False")
         return "GLProgram({})".format(", ".join(params))
 
     def add(self, shader: GLShader):
         if shader is not None:
-            if not isinstance(shader, GLShader): raise TypeError
+            if not isinstance(shader, GLShader):
+                raise TypeError
             gl.glAttachShader(self.gl_id, shader.gl_id)
             self._shaders_empty = False
             self._done_link = False
 
     def link(self):
-        if self._shaders_empty: raise RuntimeError("No shaders attached to program")
+        if self._shaders_empty:
+            raise RuntimeError("No shaders attached to program")
         gl.glLinkProgram(self.gl_id)
         rc = gl.GLint(0)
         gl.glGetProgramiv(self.gl_id, gl.GL_LINK_STATUS, ctypes.byref(rc))
@@ -135,8 +151,9 @@ class GLProgram(GLObject):
 
 @traced_methods
 class GLShape:
-
-    def __init__(self, vertices: np.ndarray, indices: np.ndarray, mode=None, texture=None):
+    def __init__(
+        self, vertices: np.ndarray, indices: np.ndarray, mode=None, texture=None
+    ):
         if mode is None:
             mode = gl.GL_TRIANGLES
         self.vertices = vertices
@@ -152,26 +169,34 @@ class GLShape:
         self.vbo = gl.GLuint(0)
         gl.glGenBuffers(1, ctypes.byref(self.vbo))
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vbo)
-        gl.glBufferData(gl.GL_ARRAY_BUFFER,  # target
-                        vertices.nbytes,  # size
-                        (gl.GLbyte * vertices.nbytes)(*vertices.tobytes()),  # data
-                        gl.GL_STATIC_DRAW)  # usage
+        gl.glBufferData(
+            gl.GL_ARRAY_BUFFER,  # target
+            vertices.nbytes,  # size
+            (gl.GLbyte * vertices.nbytes)(*vertices.tobytes()),  # data
+            gl.GL_STATIC_DRAW,
+        )  # usage
 
         self.ebo = gl.GLuint(0)
         gl.glGenBuffers(1, ctypes.byref(self.ebo))
         gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, self.ebo)
-        gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER,
-                        indices.nbytes,
-                        (gl.GLbyte * indices.nbytes)(*indices.tobytes()),
-                        gl.GL_STATIC_DRAW)
+        gl.glBufferData(
+            gl.GL_ELEMENT_ARRAY_BUFFER,
+            indices.nbytes,
+            (gl.GLbyte * indices.nbytes)(*indices.tobytes()),
+            gl.GL_STATIC_DRAW,
+        )
 
-        for ind, fld in enumerate(sorted([f for f in vertices.dtype.fields.items()], key=lambda i: i[1][1])):
-            gl.glVertexAttribPointer(ind,  # index
-                                     vertices[0][fld[0]].size,  # size
-                                     gl.GL_FLOAT,  # type
-                                     gl.GL_FALSE,  # normalized
-                                     vertices.itemsize,  # stride
-                                     ctypes.c_void_p(fld[1][1]))  # pointer
+        for ind, fld in enumerate(
+            sorted([f for f in vertices.dtype.fields.items()], key=lambda i: i[1][1])
+        ):
+            gl.glVertexAttribPointer(
+                ind,  # index
+                vertices[0][fld[0]].size,  # size
+                gl.GL_FLOAT,  # type
+                gl.GL_FALSE,  # normalized
+                vertices.itemsize,  # stride
+                ctypes.c_void_p(fld[1][1]),
+            )  # pointer
             gl.glEnableVertexAttribArray(ind)
 
         if texture is not None:
@@ -188,21 +213,30 @@ class GLShape:
         if self.texture is not None:
             gl.glEnable(self.texture.target)
             gl.glBindTexture(self.texture.target, self.texture.id)
-        gl.glDrawElements(self.mode,  # mode
-                          self.indices_size,  # count
-                          gl.GL_UNSIGNED_INT,  # type
-                          0)  # indices
+        gl.glDrawElements(
+            self.mode, self.indices_size, gl.GL_UNSIGNED_INT, 0  # mode  # count  # type
+        )  # indices
         gl.glBindVertexArray(0)
         if self.texture is not None:
             gl.glBindTexture(self.texture.target, 0)
 
     def apply_vertex_transform(self, transform):
-        return np.array([np.dot(transform, pyrr.vector4.create_from_vector3(vertex, 1.0))
-                         for vertex in self.vertices['position']])
+        return np.array(
+            [
+                np.dot(transform, pyrr.vector4.create_from_vector3(vertex, 1.0))
+                for vertex in self.vertices["position"]
+            ]
+        )
 
 
 @traced
-def look_at(camera: np.ndarray, *, direction: np.ndarray=None, target: np.ndarray=None, up: np.ndarray=None):
+def look_at(
+    camera: np.ndarray,
+    *,
+    direction: np.ndarray = None,
+    target: np.ndarray = None,
+    up: np.ndarray = None
+):
     if up is None:
         up = pyrr.vector3.create_unit_length_y(dtype=camera.dtype)
     if direction is None:
@@ -222,4 +256,11 @@ def look_at(camera: np.ndarray, *, direction: np.ndarray=None, target: np.ndarra
     return np.dot(look_at_1, look_at_2)
 
 
-__all__ = ('GLObjectException', 'GLObject', 'GLShader', 'GLProgram', 'GLShape', 'look_at')
+__all__ = (
+    "GLObjectException",
+    "GLObject",
+    "GLShader",
+    "GLProgram",
+    "GLShape",
+    "look_at",
+)
