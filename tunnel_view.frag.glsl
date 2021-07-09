@@ -1,8 +1,13 @@
-#version 330 core
+#version 300 es
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
 in vec2 v_texture;
-out vec4 gl_FragColor;
+out vec4 FragColor;
 uniform sampler2D sampTexture;
 void main()
 {
-	gl_FragColor = texture(sampTexture, v_texture);
+	FragColor = texture(sampTexture, v_texture);
 }
