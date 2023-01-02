@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 game_controller.py
-Copyright 2017 Steve Palmer
+Copyright 2023 Steve Palmer
 
 The Game Control is split into two parts:
  * The GameController

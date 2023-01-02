@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 gl_utils.py
-Copyright 2017 Steve Palmer
+Copyright 2023 Steve Palmer
 """
 
 import ctypes

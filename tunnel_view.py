@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 tunnel_view.py
-Copyright 2017 Steve Palmer
+Copyright 2023 Steve Palmer
 """
 
 import pyglet
